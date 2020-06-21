@@ -1,13 +1,36 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const bodyParser = require('body-parser')
+const jsonParser = bodyParser.json();
+const mongoose =require("mongoose");
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 
-var app = express();
+let authRouter = require('./routes/AuthenticationRouter');
+
+const app = express();
+
+/*------------------------------------------------------ */
+//connect to server nodejs
+const port = process.env.PORT || 8080;
+app.listen(port,()=>{
+    console.log(`app starting listen to post  ${port}....`)
+});
+//connect to mongoose db
+mongoose.connect('mongodb://localhost:27017/ECommerce',{useNewUrlParser: true,
+useUnifiedTopology: true  })
+
+    .then((data)=>{
+        console.log("connection sucess");
+    })
+    .catch((err)=>{
+        console.log(err +"this is error");
+
+    })
+/*----------------------------------------------------*/
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -19,8 +42,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use(authRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -39,3 +61,5 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = app;
+
+
